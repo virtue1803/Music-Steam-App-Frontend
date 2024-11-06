@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ImageBackground, StyleSheet, Image } from 'react-native';
 
-export default function WelcomeScreen() {
+export default function WelcomeScreen({navigation}) {
   return (
     <ImageBackground
       source={require('../assets/Launch Screen/Image 30.png')}
@@ -24,7 +24,7 @@ export default function WelcomeScreen() {
         <TouchableOpacity style={styles.createAccountButton}>
           <Text style={styles.createAccountText}>Create an account</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.loginButton}>
+        <TouchableOpacity style={styles.loginButton} onPress={() => navigation.navigate('Home')}>
           <Text style={styles.loginText}>I already have an account</Text>
         </TouchableOpacity>
       </View>

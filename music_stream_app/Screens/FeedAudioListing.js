@@ -8,13 +8,13 @@ export default function FeedScreen() {
       {/* Bài đăng đầu tiên */}
       <View style={styles.postContainer}>
         <View style={styles.userInfo}>
-          <Image source={{ uri: 'https://example.com/user1.jpg' }} style={styles.profileImage} />
+          <Image source={require('../assets/Feed - Audio Listing/Avatar 4.png')} style={styles.profileImage} />
           <View style={styles.userDetails}>
             <Text style={styles.userName}>Jessica Gonzalez</Text>
             <Text style={styles.postInfo}>Posted a track • 3d</Text>
           </View>
         </View>
-        <Image source={{ uri: 'https://example.com/flower.jpg' }} style={styles.postImage} />
+        <Image source={require('../assets/Feed - Audio Listing/Image 93.png')} style={styles.postImage} />
         <View style={styles.postDetails}>
           <Text style={styles.trackTitle}>FLOWER</Text>
           <Text style={styles.artistName}>Jessica Gonzalez</Text>
@@ -35,13 +35,13 @@ export default function FeedScreen() {
       {/* Bài đăng thứ hai */}
       <View style={styles.postContainer}>
         <View style={styles.userInfo}>
-          <Image source={{ uri: 'https://example.com/user2.jpg' }} style={styles.profileImage} />
+           <Image source={require('../assets/Feed - Audio Listing/Avatar 5.png')} style={styles.profileImage} />
           <View style={styles.userDetails}>
             <Text style={styles.userName}>William King</Text>
             <Text style={styles.postInfo}>Posted a track • 5d</Text>
           </View>
         </View>
-        <Image source={{ uri: 'https://example.com/me.jpg' }} style={styles.postImage} />
+        <Image source={require('../assets/Feed - Audio Listing/Image 94.png')} style={styles.postImage} />
         <View style={styles.postDetails}>
           <Text style={styles.trackTitle}>Me</Text>
           <Text style={styles.artistName}>William King</Text>
@@ -66,6 +66,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    marginTop:50
   },
   postContainer: {
     margin: 10,
