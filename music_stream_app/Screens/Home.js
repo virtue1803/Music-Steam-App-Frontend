@@ -63,7 +63,8 @@ export default function CounterApp() {
           {/* Suggestions Section */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Suggestions for you</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {/*showsHorizontalScrollIndicator={false}*/}
+            <ScrollView horizontal >
               <View style={styles.suggestionItem}>
                 <Image
                   source={require('../assets/Home - Audio Listing/Container 26.png')}
@@ -181,9 +182,6 @@ export default function CounterApp() {
           <View style={{padding:20}} ></View>
         </ScrollView>
       </ScrollView>
-      <View>
-        <BottomMenu />
-      </View>
     </SafeAreaView>
   );
 }
@@ -247,8 +245,6 @@ const styles = StyleSheet.create({
 
   suggestionItem: { marginRight: 10, alignItems: 'center', height: 300 },
   suggestionImage: { width: 200, borderRadius: 8 },
-  suggestionText: { fontWeight: 'bold', marginTop: 8 },
-  suggestionSubText: { color: '#555' },
 
   chartItem: {
     marginRight: 10,
@@ -257,8 +253,6 @@ const styles = StyleSheet.create({
 
     
   },
-  chartTitle: { fontSize: 18, fontWeight: 'bold' , marginRight:10},
-  chartSubtitle: { color: '#777' },
 
   albumItem: { marginRight: 10 , width:130},
   albumImage: { width: 120, height: 120, borderRadius: 8 },
