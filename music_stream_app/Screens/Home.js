@@ -147,7 +147,7 @@ export default function CounterApp({ navigation }) {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Popular artists</Text>
             <ScrollView horizontal>
-              <TouchableOpacity  style={styles.artistItem} >
+              <TouchableOpacity  style={styles.artistItem} onPress={() => navigation.navigate('ArtistProfile')}>
                 <Image
                   source={require('../assets/Home - Audio Listing/Image 39.png')}
                   style={styles.artistImage}
@@ -167,7 +167,7 @@ export default function CounterApp({ navigation }) {
                   <Text style={styles.followButtonText}>Follow</Text>
                 </TouchableOpacity>
               </TouchableOpacity >
-              <TouchableOpacity  style={styles.artistItem}>
+              <TouchableOpacity  style={styles.artistItem} onPress={() => navigation.navigate('ArtistProfile')}>
                 <Image
                   source={require('../assets/Home - Audio Listing/Image 41.png')}
                   style={styles.artistImage}
