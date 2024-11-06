@@ -5,10 +5,12 @@ import { Ionicons } from '@expo/vector-icons';
 
 import Home from './Screens/Home'
 import LaunchScreen from './Screens/LaunchScreen'
+import TopScreen from './Screens/TopScreen'
+import LaunchScreenPremium from './Screens/LaunchScreenPremium'
 
 export default function HomeScreen() {
   return (
-    <LaunchScreen></LaunchScreen>
+    <Home></Home>
   );
 }
 
