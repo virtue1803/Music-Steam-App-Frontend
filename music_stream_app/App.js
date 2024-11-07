@@ -19,7 +19,7 @@ const Tab = createBottomTabNavigator();
 
 function HomeStack() {
   return (
-    <Stack.Navigator initialRouteName="LaunchScreen">
+    <Stack.Navigator initialRouteName="Home">
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="ArtistProfile" component={ArtistProfile} />
       <Stack.Screen name="FeedAudioListing" component={FeedAudioListing} />
