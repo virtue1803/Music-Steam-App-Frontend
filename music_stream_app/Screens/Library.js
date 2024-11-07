@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, FlatList, Image, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, TextInput, FlatList, Image, TouchableOpacity, ScrollView } from 'react-native';
 
 const YourLibraryScreen = () => {
   const [selectedTag, setSelectedTag] = useState('All');
@@ -8,16 +8,17 @@ const YourLibraryScreen = () => {
   const artist = {
     name: 'Mer Watson',
     followers: '1.234K Followers',
-    profilePic: 'https://picsum.photos/200',
+    profilePic: require('../assets/My Library/Image 107.png'), // Đường dẫn ảnh nghệ sĩ từ thư mục cục bộ
   };
 
+  // Dữ liệu bài hát với ảnh cục bộ
   const allSongsData = [
-    { id: '1', title: 'FLOWER', artist: 'Jessica Gonzalez', plays: '2.1M', duration: '3:36', liked: true, tag: 'Songs' },
-    { id: '2', title: 'Shape of You', artist: 'Anthony Taylor', plays: '68M', duration: '3:35', liked: true, tag: 'Songs' },
-    { id: '3', title: 'Blinding Lights', artist: 'Ashley Scott', plays: '4 songs', duration: '', liked: false, tag: 'Playlists' },
-    { id: '4', title: 'Levitating', artist: 'Anthony Taylor', plays: '9M', duration: '7:48', liked: true, tag: 'Songs' },
-    { id: '5', title: 'Astronaut in the Ocean', artist: 'Pedro Moreno', plays: '23M', duration: '3:36', liked: true, tag: 'Albums' },
-    { id: '6', title: 'Dynamite', artist: 'Elena Jimenez', plays: '10M', duration: '6:22', liked: true, tag: 'Albums' },
+    { id: '1', title: 'FLOWER', artist: 'Jessica Gonzalez', plays: '2.1M', duration: '3:36', liked: true, tag: 'Songs', image: require('../assets/My Library/Image 101.png') },
+    { id: '2', title: 'Shape of You', artist: 'Anthony Taylor', plays: '68M', duration: '3:35', liked: true, tag: 'Songs', image: require('../assets/My Library/Image 102.png') },
+    { id: '3', title: 'Blinding Lights', artist: 'Ashley Scott', plays: '4 songs', duration: '', liked: false, tag: 'Playlists', image: require('../assets/My Library/Image 103.png') },
+    { id: '4', title: 'Levitating', artist: 'Anthony Taylor', plays: '9M', duration: '7:48', liked: true, tag: 'Songs', image: require('../assets/My Library/Image 104.png') },
+    { id: '5', title: 'Astronaut in the Ocean', artist: 'Pedro Moreno', plays: '23M', duration: '3:36', liked: true, tag: 'Albums', image: require('../assets/My Library/Image 105.png') },
+    { id: '6', title: 'Dynamite', artist: 'Elena Jimenez', plays: '10M', duration: '6:22', liked: true, tag: 'Albums', image: require('../assets/My Library/Image 106.png') },
   ];
 
   const getFilteredData = () => {
@@ -60,7 +61,7 @@ const YourLibraryScreen = () => {
 
       {/* Following Section */}
       <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 10 }}>
-        <Image source={{ uri: artist.profilePic }} style={{ width: 60, height: 60, borderRadius: 30, marginRight: 16 }} />
+        <Image source={artist.profilePic} style={{ width: 60, height: 60, borderRadius: 30, marginRight: 16 }} />
         <View style={{ flex: 1 }}>
           <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{artist.name}</Text>
           <Text style={{ color: '#777' }}>{artist.followers}</Text>
@@ -76,7 +77,7 @@ const YourLibraryScreen = () => {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={{ flexDirection: 'row', alignItems: 'center', padding: 16 }}>
-            <Image source={{ uri: 'https://picsum.photos/100' }} style={{ width: 50, height: 50, borderRadius: 8, marginRight: 16 }} />
+            <Image source={item.image} style={{ width: 50, height: 50, borderRadius: 8, marginRight: 16 }} />
             <View style={{ flex: 1 }}>
               <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.title}</Text>
               <Text style={{ color: '#777' }}>{item.artist}</Text>
@@ -88,8 +89,6 @@ const YourLibraryScreen = () => {
           </View>
         )}
       />
-
-      
     </View>
   );
 };
