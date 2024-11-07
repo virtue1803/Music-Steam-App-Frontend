@@ -27,9 +27,9 @@ const SearchResultsScreen = () => {
   const getData = () => {
     switch (selectedTab) {
       case 'Tracks':
-        return allData.filter((item, index) => index < 3); // chỉ hiển thị một số bài hát để làm ví dụ
+        return allData.filter((item, index) => index < 3); // Chỉ hiển thị một số bài hát để làm ví dụ
       case 'Albums':
-        return allData.slice(3, 5); // chỉ hiển thị một số album để làm ví dụ
+        return allData.slice(3, 5); // Chỉ hiển thị một số album để làm ví dụ
       case 'Artists':
         return [artist];
       default:

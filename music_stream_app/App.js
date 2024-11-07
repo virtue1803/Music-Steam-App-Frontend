@@ -13,6 +13,9 @@ import FeedAudioListing from './Screens/FeedAudioListing';
 import Library from './Screens/Library';
 import Search from './Screens/Search';
 import ArtistProfile from './Screens/ArtistProfile';
+import PlayAudioScreen from './Screens/PlayAudioScreen';
+import YourLibraryScreen from './Screens/Library';
+import SearchResultsScreen from './Screens/Search';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -23,6 +26,10 @@ function HomeStack() {
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="ArtistProfile" component={ArtistProfile} />
       <Stack.Screen name="FeedAudioListing" component={FeedAudioListing} />
+      <Stack.Screen name="Library" component={Library} />
+      <Stack.Screen name="YourLibrary" component={YourLibraryScreen} />
+      <Stack.Screen name="SearchResults" component={SearchResultsScreen} />
+      <Stack.Screen name="PlayAudio" component={PlayAudioScreen} />
     </Stack.Navigator>
   );
 }
@@ -35,7 +42,8 @@ function TabNavigator() {
         tabBarActiveTintColor: 'tomato',
         tabBarInactiveTintColor: 'gray',
         headerShown: false,
-      }}>
+      }}
+    >
       <Tab.Screen
         name="Home"
         component={HomeStack}
@@ -83,7 +91,7 @@ function TabNavigator() {
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="LaunchScreen" >
+      <Stack.Navigator initialRouteName="LaunchScreen">
         <Stack.Screen
           name="LaunchScreen"
           component={LaunchScreen}

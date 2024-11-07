@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, FlatList, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const YourLibraryScreen = () => {
   const [selectedTag, setSelectedTag] = useState('All');
+  const navigation = useNavigation();
 
   const tags = ["All", "Playlists", "New tag", "Songs", "Albums", "Artists"];
   const artist = {
     name: 'Mer Watson',
     followers: '1.234K Followers',
-    profilePic: require('../assets/My Library/Image 107.png'), // Đường dẫn ảnh nghệ sĩ từ thư mục cục bộ
+    profilePic: require('../assets/My Library/Image 107.png'),
   };
 
-  // Dữ liệu bài hát với ảnh cục bộ
   const allSongsData = [
     { id: '1', title: 'FLOWER', artist: 'Jessica Gonzalez', plays: '2.1M', duration: '3:36', liked: true, tag: 'Songs', image: require('../assets/My Library/Image 101.png') },
     { id: '2', title: 'Shape of You', artist: 'Anthony Taylor', plays: '68M', duration: '3:35', liked: true, tag: 'Songs', image: require('../assets/My Library/Image 102.png') },
@@ -76,7 +77,10 @@ const YourLibraryScreen = () => {
         data={getFilteredData()}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={{ flexDirection: 'row', alignItems: 'center', padding: 16 }}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('PlayAudio', item)}
+            style={{ flexDirection: 'row', alignItems: 'center', padding: 16 }}
+          >
             <Image source={item.image} style={{ width: 50, height: 50, borderRadius: 8, marginRight: 16 }} />
             <View style={{ flex: 1 }}>
               <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.title}</Text>
@@ -86,7 +90,7 @@ const YourLibraryScreen = () => {
             <TouchableOpacity>
               <Text style={{ fontSize: 24, color: item.liked ? 'blue' : '#ddd' }}>💙</Text>
             </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
         )}
       />
     </View>
