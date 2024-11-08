@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, FlatList, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
 
 const Search = () => {
   const [selectedTab, setSelectedTab] = useState('All');
@@ -92,7 +94,7 @@ const Search = () => {
               <Text style={{ color: '#888', fontSize: 12 }}>{item.plays} • {item.duration}</Text>
             </View>
             <TouchableOpacity style={{ padding: 10 }}>
-              <Text style={{ fontSize: 24, color: '#888' }}>⋮</Text>
+              <Icon name="more-vert" size={24} color="#888" />
             </TouchableOpacity>
           </TouchableOpacity>
         )}
