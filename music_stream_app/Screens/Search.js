@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, FlatList, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-const SearchResultsScreen = () => {
+const Search = () => {
   const [selectedTab, setSelectedTab] = useState('All');
   const navigation = useNavigation();
 
@@ -101,4 +101,4 @@ const SearchResultsScreen = () => {
   );
 };
 
-export default SearchResultsScreen;
+export default Search;
