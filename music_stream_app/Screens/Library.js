@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, FlatList, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-const YourLibraryScreen = () => {
+const Library = () => {
   const [selectedTag, setSelectedTag] = useState('All');
   const navigation = useNavigation();
 
@@ -97,4 +97,4 @@ const YourLibraryScreen = () => {
   );
 };
 
-export default YourLibraryScreen;
+export default Library;
