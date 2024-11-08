@@ -11,11 +11,10 @@ import TopScreen from './Screens/TopScreen';
 import LaunchScreenPremium from './Screens/LaunchScreenPremium';
 import FeedAudioListing from './Screens/FeedAudioListing';
 import Library from './Screens/Library';
+
 import Search from './Screens/Search';
 import ArtistProfile from './Screens/ArtistProfile';
 import PlayAudioScreen from './Screens/PlayAudioScreen';
-import YourLibraryScreen from './Screens/Library';
-import SearchResultsScreen from './Screens/Search';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -27,12 +26,14 @@ function HomeStack() {
       <Stack.Screen name="ArtistProfile" component={ArtistProfile} />
       <Stack.Screen name="FeedAudioListing" component={FeedAudioListing} />
       <Stack.Screen name="Library" component={Library} />
-      <Stack.Screen name="YourLibrary" component={YourLibraryScreen} />
-      <Stack.Screen name="SearchResults" component={SearchResultsScreen} />
+      {/* Xóa dòng sau nếu không dùng */}
+      {/* <Stack.Screen name="YourLibrary" component={YourLibraryScreen} /> */}
+      <Stack.Screen name="Search" component={Search} />
       <Stack.Screen name="PlayAudio" component={PlayAudioScreen} />
     </Stack.Navigator>
   );
 }
+
 
 function TabNavigator() {
   return (
