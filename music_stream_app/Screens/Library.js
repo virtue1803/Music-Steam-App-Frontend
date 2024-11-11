@@ -78,7 +78,16 @@ const Library = () => {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity
-            onPress={() => navigation.navigate('PlayAudio', item)}
+            onPress={() => {
+              console.log('Navigating to PlayAudio with item:', item); // Debug log
+              navigation.navigate('PlayAudio', {
+                title: item.title,
+                artist: item.artist,
+                image: item.image,
+                plays: item.plays,
+                duration: item.duration,
+              });
+            }}
             style={{ flexDirection: 'row', alignItems: 'center', padding: 16 }}
           >
             <Image source={item.image} style={{ width: 50, height: 50, borderRadius: 8, marginRight: 16 }} />
