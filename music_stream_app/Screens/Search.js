@@ -3,7 +3,6 @@ import { View, Text, TextInput, FlatList, Image, TouchableOpacity, ScrollView } 
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-
 const Search = () => {
   const [selectedTab, setSelectedTab] = useState('All');
   const navigation = useNavigation();
@@ -84,7 +83,16 @@ const Search = () => {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity
-            onPress={() => navigation.navigate('PlayAudio', item)}
+            onPress={() => {
+              console.log('Navigating to PlayAudio with item:', item); // Debug log
+              navigation.navigate('PlayAudio', {
+                title: item.title,
+                artist: item.artist,
+                image: item.image,
+                plays: item.plays,
+                duration: item.duration,
+              });
+            }}
             style={{ flexDirection: 'row', paddingVertical: 10, paddingHorizontal: 16, alignItems: 'center' }}
           >
             <Image source={item.image} style={{ width: 50, height: 50, borderRadius: 8, marginRight: 12 }} />
