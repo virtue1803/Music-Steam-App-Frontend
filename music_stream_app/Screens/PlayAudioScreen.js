@@ -5,7 +5,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const PlayAudioScreen = ({ route, navigation }) => {
-  const { title, artist, image, plays, duration } = route.params;
+  console.log('PlayAudioScreen params:', route.params);
+  const { title, artist, image, plays, duration } = route.params || {};
 
   return (
     <View style={styles.container}>
@@ -15,7 +16,7 @@ const PlayAudioScreen = ({ route, navigation }) => {
           <Icon name="chevron-down" size={24} color="#FFF" />
         </TouchableOpacity>
         <Text style={styles.headerText}>Play</Text>
-        <View />
+        <View style={{ width: 24 }} /> {/* Placeholder for symmetry */}
       </View>
 
       {/* Song Image */}
@@ -46,7 +47,7 @@ const PlayAudioScreen = ({ route, navigation }) => {
       {/* Controls */}
       <View style={styles.controlsContainer}>
         <TouchableOpacity>
-          <Icon name="repeat" size={24} color="#FFF" />
+          <Icon name="shuffle" size={24} color="#FFF" />
         </TouchableOpacity>
         <TouchableOpacity>
           <Icon name="play-back" size={24} color="#FFF" />
@@ -58,19 +59,19 @@ const PlayAudioScreen = ({ route, navigation }) => {
           <Icon name="play-forward" size={24} color="#FFF" />
         </TouchableOpacity>
         <TouchableOpacity>
-          <Icon name="ellipsis-horizontal" size={24} color="#FFF" />
+          <Icon name="repeat" size={24} color="#FFF" />
         </TouchableOpacity>
       </View>
 
       {/* Social Actions */}
       <View style={styles.socialContainer}>
-        <TouchableOpacity>
+        <TouchableOpacity style={styles.socialItem}>
           <FontAwesome name="heart" size={18} color="#FFF" />
-          <Text style={styles.socialText}> 12K</Text>
+          <Text style={styles.socialText}>12K</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity style={styles.socialItem}>
           <FontAwesome name="comment" size={18} color="#FFF" />
-          <Text style={styles.socialText}> 450</Text>
+          <Text style={styles.socialText}>450</Text>
         </TouchableOpacity>
         <TouchableOpacity>
           <FontAwesome name="share" size={18} color="#FFF" />
@@ -144,6 +145,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingVertical: 10,
+  },
+  socialItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   socialText: {
     color: '#FFF',

@@ -29,7 +29,7 @@ function HomeStack() {
       {/* Xóa dòng sau nếu không dùng */}
       {/* <Stack.Screen name="YourLibrary" component={YourLibraryScreen} /> */}
       <Stack.Screen name="Search" component={Search} />
-      <Stack.Screen name="PlayAudio" component={PlayAudioScreen} />
+      <Stack.Screen name="PlayAudio" component={PlayAudioScreen} options={{ headerShown: false}} />
     </Stack.Navigator>
   );
 }
