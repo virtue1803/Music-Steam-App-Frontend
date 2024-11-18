@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   Text,
   View,
@@ -14,8 +14,13 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import BottomMenu from './BottomMenu.js';
+import ProfileUser from "./ProfileUser/ProfileUser"; // Import màn hình Logout
+import { artistProfiles } from '../data/artistProfiles';
 
 export default function CounterApp({ navigation }) {
+
+ const [logoutVisible, setLogoutVisible] = useState(false); 
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={true}>
@@ -36,12 +41,18 @@ export default function CounterApp({ navigation }) {
               </TouchableOpacity>
 
               {/* Profile Image */}
-              <TouchableOpacity style={styles.profileButton}>
+              <TouchableOpacity style={styles.profileButton}  onPress={() => setLogoutVisible(true)}>
                 <Image
                   source={require('../assets/Home - Audio Listing/Avatar 3.png')} // Replace with your profile image URL
                   style={styles.profileImage}
                 />
               </TouchableOpacity>
+               {/* Modal Logout */}
+      <ProfileUser
+        visible={logoutVisible}
+        onClose={() => setLogoutVisible(false)} // Đóng modal khi nhấn Hủy
+        navigation={navigation}
+      />
             </View>
           </View>
           <View style={styles.header}>
@@ -145,40 +156,23 @@ export default function CounterApp({ navigation }) {
 
           {/* Popular Artists Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Popular artists</Text>
-            <ScrollView horizontal>
-              <TouchableOpacity  style={styles.artistItem} onPress={() => navigation.navigate('ArtistProfile')}>
-                <Image
-                  source={require('../assets/Home - Audio Listing/Image 39.png')}
-                  style={styles.artistImage}
-                />
-                <Text style={styles.artistName}>Jennifer Wilson</Text>
+          <Text style={styles.sectionTitle}>Popular Artists</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {artistProfiles.map((artist) => (
+              <TouchableOpacity
+                key={artist.id}
+                style={styles.artistItem}
+                onPress={() => navigation.navigate('ArtistProfile', { artistId: artist.id })}
+              >
+                <Image source={artist.image} style={styles.artistImage} />
+                <Text style={styles.artistName}>{artist.name}</Text>
                 <TouchableOpacity style={styles.followButton}>
                   <Text style={styles.followButtonText}>Follow</Text>
                 </TouchableOpacity>
-              </TouchableOpacity >
-              <TouchableOpacity  style={styles.artistItem} onPress={() => navigation.navigate('ArtistProfile')}>
-                <Image
-                  source={require('../assets/Home - Audio Listing/Image 40.png')}
-                  style={styles.artistImage}
-                />
-                <Text style={styles.artistName}>Elizabeth Hall</Text>
-                <TouchableOpacity style={styles.followButton}>
-                  <Text style={styles.followButtonText}>Follow</Text>
-                </TouchableOpacity>
-              </TouchableOpacity >
-              <TouchableOpacity  style={styles.artistItem} onPress={() => navigation.navigate('ArtistProfile')}>
-                <Image
-                  source={require('../assets/Home - Audio Listing/Image 41.png')}
-                  style={styles.artistImage}
-                />
-                <Text style={styles.artistName}>Jennifer Wilson</Text>
-                <TouchableOpacity style={styles.followButton}>
-                  <Text style={styles.followButtonText}>Follow</Text>
-                </TouchableOpacity>
-              </TouchableOpacity >
-            </ScrollView>
-          </View>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
           <View style={{padding:20}} ></View>
         </ScrollView>
       </ScrollView>

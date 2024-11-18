@@ -11,8 +11,10 @@ import TopScreen from './Screens/TopScreen';
 import LaunchScreenPremium from './Screens/LaunchScreenPremium';
 import FeedAudioListing from './Screens/FeedAudioListing';
 import Library from './Screens/Library';
+
 import Search from './Screens/Search';
 import ArtistProfile from './Screens/ArtistProfile';
+import PlayAudioScreen from './Screens/PlayAudioScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -23,6 +25,9 @@ function HomeStack() {
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="ArtistProfile" component={ArtistProfile} />
       <Stack.Screen name="FeedAudioListing" component={FeedAudioListing} />
+      <Stack.Screen name="Library" component={Library} />
+      <Stack.Screen name="Search" component={Search} />
+      <Stack.Screen name="PlayAudioScreen" component={PlayAudioScreen} />
     </Stack.Navigator>
   );
 }
@@ -83,12 +88,14 @@ function TabNavigator() {
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="LaunchScreen" >
+      <Stack.Navigator initialRouteName="LaunchScreen">
         <Stack.Screen
           name="LaunchScreen"
           component={LaunchScreen}
           options={{ headerShown: false }}
         />
+         <Stack.Screen name="ArtistProfile" component={ArtistProfile} />
+          <Stack.Screen name="PlayAudioScreen" component={PlayAudioScreen} />
         <Stack.Screen
           name="Home"
           component={TabNavigator}

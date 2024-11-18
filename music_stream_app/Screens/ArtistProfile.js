@@ -1,85 +1,96 @@
 import React from 'react';
-import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+  ScrollView,
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { artistProfiles } from '../data/artistProfiles'; // Import dữ liệu nghệ sĩ
+import { songs } from '../data/songs'; // Import dữ liệu bài hát
 
-// Data arrays with image paths
-const popularSongs = [
-  { name: "Let you free", image: require('../assets/Artist Profile/Image 66.png') },
-  { name: "Blinding Lights", image: require('../assets/Artist Profile/Image 67.png') },
-  { name: "Levitating", image: require('../assets/Artist Profile/Image 68.png') },
-  { name: "Astronaut in the Ocean", image: require('../assets/Artist Profile/Image 69.png') },
-  { name: "Dynamite", image: require('../assets/Artist Profile/Image 70.png') },
-];
+class ArtistListScreen extends React.Component {
+  state = {
+    selectedArtistId: null, // Không chọn nghệ sĩ ban đầu
+  };
 
-const albums = [
-  { name: "ME", artist: "Jessica Gonzalez", image: require('../assets/Artist Profile/Image 71.png') },
-  { name: "Magna nost", artist: "Jessica Gonzalez", image: require('../assets/Artist Profile/Image 72.png') },
-  { name: "Proident", artist: "Jessica Gonzalez", image: require('../assets/Artist Profile/Image 77.png') },
-];
+  // Lọc các bài hát của nghệ sĩ
+  getPopularSongs = (artistId) => {
+    return songs.filter((song) => song.artistId === artistId);
+  };
 
-const fansAlsoLike = [
-  { name: "Magna nost", artist: "Jessica Gonzalez", image: require('../assets/Artist Profile/Image 74.png') },
-  { name: "Exercitat", artist: "Brian Harris", image: require('../assets/Artist Profile/Image 75.png') },
-  { name: "Tempor", artist: "Tyler Adams", image: require('../assets/Artist Profile/Image 76.png') },
-];
+  // Xử lý khi chọn nghệ sĩ
+  handleArtistSelect = (id) => {
+    this.setState({ selectedArtistId: id });
+  };
 
-class ProfileScreen extends React.Component {
   render() {
+    const { selectedArtistId } = this.state;
+
+    // Nếu có nghệ sĩ được chọn, hiển thị thông tin và bài hát của nghệ sĩ đó
+    if (selectedArtistId) {
+      const artist = artistProfiles.find(
+        (artist) => artist.id === selectedArtistId
+      );
+      const popularSongs = this.getPopularSongs(selectedArtistId);
+
+      return (
+        <ScrollView style={styles.container}>
+          {/* Thông tin nghệ sĩ */}
+          <View style={styles.profileSection}>
+            <Image source={artist.image} style={styles.profileImage} />
+            <Text style={styles.name}>{artist.name}</Text>
+            <Text style={styles.bio}>{artist.bio}</Text>
+          </View>
+
+          {/* Bài hát của nghệ sĩ */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Popular Songs</Text>
+            {popularSongs.length > 0 ? (
+              popularSongs.map((song, index) => (
+                // Trong ArtistListScreen.js
+                <TouchableOpacity
+                  key={index}
+                  onPress={() =>
+                    this.props.navigation.navigate('PlayAudioScreen', { song })
+                    
+                  }
+                  style={styles.songRow}>
+                  <Text style={styles.songTitle}>{song.title}</Text>
+                </TouchableOpacity>
+              ))
+            ) : (
+              <Text style={styles.errorText}>
+                Không có bài hát cho nghệ sĩ này.
+              </Text>
+            )}
+          </View>
+
+          {/* Quay lại danh sách nghệ sĩ */}
+          <TouchableOpacity
+            onPress={() => this.setState({ selectedArtistId: null })}
+            style={styles.backButton}>
+            <Text style={styles.backButtonText}>Back to Artist List</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      );
+    }
+
+    // Nếu chưa chọn nghệ sĩ, hiển thị danh sách nghệ sĩ
     return (
       <ScrollView style={styles.container}>
-        {/* Profile Section */}
-        <View style={styles.profileSection}>
-          <Image source={require('../assets/Artist Profile/Image 63.png')} style={styles.profileImage} />
-          <Text style={styles.name}>Ryan Young</Text>
-          <Text style={styles.followers}>65.1k Followers</Text>
-          <TouchableOpacity style={styles.followButton}>
-            <Text style={styles.followButtonText}>Follow</Text>
+        <Text style={styles.title}>Danh sách nghệ sĩ</Text>
+        {artistProfiles.map((artist) => (
+          <TouchableOpacity
+            key={artist.id}
+            onPress={() => this.handleArtistSelect(artist.id)}
+            style={styles.artistItem}>
+            <Image source={artist.image} style={styles.artistImage} />
+            <Text style={styles.artistName}>{artist.name}</Text>
           </TouchableOpacity>
-          <Ionicons name="play-circle" size={50} color="black" style={styles.playIcon} />
-        </View>
-
-        {/* Popular Songs Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Popular</Text>
-          {popularSongs.map((song, index) => (
-            <View key={index} style={styles.songRow}>
-              <Image source={song.image} style={styles.songImage} />
-              <View style={styles.songInfo}>
-                <Text style={styles.songTitle}>{song.name}</Text>
-                <Text style={styles.songDetails}>Ryan Young • 3:25</Text>
-              </View>
-              <Ionicons name="ellipsis-horizontal" size={24} color="black" />
-            </View>
-          ))}
-        </View>
-
-        {/* Albums Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Albums</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {albums.map((album, index) => (
-              <View key={index} style={styles.album}>
-                <Image source={album.image} style={styles.albumImage} />
-                <Text style={styles.albumTitle}>{album.name}</Text>
-                <Text style={styles.albumArtist}>{album.artist}</Text>
-              </View>
-            ))}
-          </ScrollView>
-        </View>
-
-        {/* Fans Also Like Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Fans also like</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {fansAlsoLike.map((fan, index) => (
-              <View key={index} style={styles.fan}>
-                <Image source={fan.image} style={styles.fanImage} />
-                <Text style={styles.fanName}>{fan.name}</Text>
-                <Text style={styles.fanArtist}>{fan.artist}</Text>
-              </View>
-            ))}
-          </ScrollView>
-        </View>
+        ))}
       </ScrollView>
     );
   }
@@ -105,23 +116,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 10,
   },
-  followers: {
+  bio: {
     fontSize: 16,
     color: '#666',
-  },
-  followButton: {
-    backgroundColor: '#1DB954',
-    borderRadius: 20,
-    paddingVertical: 5,
-    paddingHorizontal: 20,
     marginTop: 10,
-  },
-  followButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  playIcon: {
-    marginTop: 20,
+    paddingHorizontal: 20,
+    textAlign: 'center',
   },
   section: {
     paddingHorizontal: 20,
@@ -137,59 +137,52 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
-  songImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 5,
-  },
-  songInfo: {
-    flex: 1,
-    marginLeft: 10,
-  },
   songTitle: {
     fontSize: 16,
     fontWeight: 'bold',
+    flex: 1,
   },
-  songDetails: {
-    fontSize: 14,
-    color: '#666',
+  playIcon: {
+    marginLeft: 10,
   },
-  album: {
+  backButton: {
+    paddingVertical: 10,
     alignItems: 'center',
-    marginRight: 15,
+    marginTop: 20,
   },
-  albumImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 5,
+  backButtonText: {
+    fontSize: 16,
+    color: '#1DB954',
   },
-  albumTitle: {
-    fontSize: 14,
+  errorText: {
+    fontSize: 18,
+    color: 'red',
+    textAlign: 'center',
+    marginTop: 20,
+  },
+  title: {
+    fontSize: 24,
     fontWeight: 'bold',
-    marginTop: 5,
+    paddingVertical: 20,
+    textAlign: 'center',
   },
-  albumArtist: {
-    fontSize: 12,
-    color: '#666',
-  },
-  fan: {
+  artistItem: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 15,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderColor: '#ddd',
   },
-  fanImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 5,
+  artistImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
   },
-  fanName: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    marginTop: 5,
-  },
-  fanArtist: {
-    fontSize: 12,
-    color: '#666',
+  artistName: {
+    fontSize: 18,
+    marginLeft: 10,
   },
 });
 
-export default ProfileScreen;
+export default ArtistListScreen;
