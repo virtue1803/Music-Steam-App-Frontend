@@ -15,6 +15,9 @@ import Library from './Screens/Library';
 import Search from './Screens/Search';
 import ArtistProfile from './Screens/ArtistProfile';
 import PlayAudioScreen from './Screens/PlayAudioScreen';
+import CreateAccount from './Screens/CreateAccount';
+import LoginAccount from './Screens/LoginAccount';
+import AlbumSongs from './Screens/AlbumSongs';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -26,14 +29,12 @@ function HomeStack() {
       <Stack.Screen name="ArtistProfile" component={ArtistProfile} />
       <Stack.Screen name="FeedAudioListing" component={FeedAudioListing} />
       <Stack.Screen name="Library" component={Library} />
-      {/* Xóa dòng sau nếu không dùng */}
-      {/* <Stack.Screen name="YourLibrary" component={YourLibraryScreen} /> */}
       <Stack.Screen name="Search" component={Search} />
-      <Stack.Screen name="PlayAudio" component={PlayAudioScreen} options={{ headerShown: false}} />
+      <Stack.Screen name="PlayAudioScreen" component={PlayAudioScreen} />
+      <Stack.Screen name="AlbumSongs" component={AlbumSongs} />
     </Stack.Navigator>
   );
 }
-
 
 function TabNavigator() {
   return (
@@ -43,8 +44,7 @@ function TabNavigator() {
         tabBarActiveTintColor: 'tomato',
         tabBarInactiveTintColor: 'gray',
         headerShown: false,
-      }}
-    >
+      }}>
       <Tab.Screen
         name="Home"
         component={HomeStack}
@@ -98,11 +98,16 @@ export default function App() {
           component={LaunchScreen}
           options={{ headerShown: false }}
         />
+        <Stack.Screen name="ArtistProfile" component={ArtistProfile} />
+        <Stack.Screen name="PlayAudioScreen" component={PlayAudioScreen} />
+        <Stack.Screen name="AlbumSongs" component={AlbumSongs} />
         <Stack.Screen
           name="Home"
           component={TabNavigator}
           options={{ headerShown: false }}
         />
+        <Stack.Screen name="CreateAccount" component={CreateAccount} />
+        <Stack.Screen name="LoginAccount" component={LoginAccount} />
       </Stack.Navigator>
     </NavigationContainer>
   );
