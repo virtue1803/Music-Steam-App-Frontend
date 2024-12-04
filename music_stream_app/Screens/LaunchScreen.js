@@ -21,10 +21,16 @@ export default function WelcomeScreen({navigation}) {
 
       {/* Buttons */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.createAccountButton}>
+        <TouchableOpacity
+          style={styles.createAccountButton}
+          onPress={() => navigation.navigate('CreateAccount')} // Điều hướng đến màn hình tạo tài khoản
+        >
           <Text style={styles.createAccountText}>Create an account</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.loginButton} onPress={() => navigation.navigate('Home')}>
+        <TouchableOpacity
+          style={styles.loginButton}
+          onPress={() => navigation.navigate('LoginAccount')} // Điều hướng đến màn hình đăng nhập
+        >
           <Text style={styles.loginText}>I already have an account</Text>
         </TouchableOpacity>
       </View>
