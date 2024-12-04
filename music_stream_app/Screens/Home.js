@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Text,
   View,
-  Button,
   ScrollView,
   Image,
   SafeAreaView,
@@ -10,264 +9,270 @@ import {
   TouchableOpacity,
   TextInput,
   StatusBar,
-  ImageBackground,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import BottomMenu from './BottomMenu.js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import ProfileUser from './ProfileUser/ProfileUser'; // Import màn hình Logout
+import { artistProfiles } from '../data/artistProfiles';
+import { albums } from '../data/albums'; // Đường dẫn đến file album.js
+import { songs } from '../data/songs'; 
 
-export default function CounterApp({ navigation }) {
+export default function HomeScreen({ navigation }) {
+  const [logoutVisible, setLogoutVisible] = useState(false);
+  const [username, setUsername] = useState('');
+
+  // Lấy tên người dùng từ AsyncStorage
+  useEffect(() => {
+    const fetchUsername = async () => {
+      const storedUsername = await AsyncStorage.getItem('username');
+      if (storedUsername) {
+        setUsername(storedUsername);
+      }
+    };
+    fetchUsername();
+  }, []);
+
+  // Component Section để tái sử dụng
+  const Section = ({ title, children }) => (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>{title}</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        {children}
+      </ScrollView>
+    </View>
+  );
+
+  // Xử lý khi nhấn vào album
+  const handleAlbumSelect = (albumId) => {
+    // Lọc các bài hát trong album dựa trên idAlbum của album
+    const albumData = albums.find((album) => album.idAlbum === albumId);
+    if (albumData) {
+      // Lọc bài hát trong album dựa trên idSongs
+      const albumSongs = songs.filter((song) =>
+        albumData.idSongs.includes(song.id)
+      );
+
+      // Điều hướng đến màn hình AlbumSongs và truyền dữ liệu bài hát
+      navigation.navigate('AlbumSongs', { albumId, albumSongs });
+    }
+  };
+
+  // Hàm lấy ngẫu nhiên 5 bài hát
+  const getRandomSongs = () => {
+    // Trộn mảng
+    const shuffled = songs.sort(() => 0.5 - Math.random());
+    // Lấy 5 phần tử đầu tiên
+    return shuffled.slice(0, 5);
+  };
+
+  const randomSongs = getRandomSongs();
+
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={true}>
-        <ScrollView style={styles.container}>
-          {/* Header */}
-          <View style={styles.header1}>
-            <StatusBar barStyle="dark-content" />
-            {/* Logo */}
+      <StatusBar barStyle="dark-content" />
+      {/* Header */}
+      <View style={styles.header}>
+        <Image
+          source={require('../assets/Home - Audio Listing/Image 36.png')}
+          style={styles.logo}
+        />
+        <View style={styles.rightIcons}>
+          <TouchableOpacity style={styles.iconButton}>
+            <Ionicons name="notifications" size={24} color="gray" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.profileButton}
+            onPress={() => setLogoutVisible(true)} // Hiển thị Modal Logout
+          >
             <Image
-              source={require('../assets/Home - Audio Listing/Image 36.png')} // Replace with your logo image URL
-              style={styles.logo}
+              source={require('../assets/Home - Audio Listing/Avatar 3.png')} // Đường dẫn ảnh đại diện
+              style={styles.profileImage}
             />
+          </TouchableOpacity>
 
-            <View style={styles.rightIcons}>
-              {/* Notification Icon */}
-              <TouchableOpacity style={styles.iconButton}>
-                <Ionicons name="notifications" size={24} color="gray" />
-              </TouchableOpacity>
+          {/* Modal Logout */}
+          {logoutVisible && (
+            <ProfileUser
+              visible={logoutVisible}
+              onClose={() => setLogoutVisible(false)}
+              navigation={navigation}
+              username={username} // Truyền username từ state
+            />
+          )}
+        </View>
+      </View>
 
-              {/* Profile Image */}
-              <TouchableOpacity style={styles.profileButton}>
+      <ScrollView style={styles.scrollView}>
+        {/* Greeting */}
+        <View style={styles.greetingContainer}>
+          <Text style={styles.greeting}>Hello,</Text>
+          <Text style={styles.username}>{username || 'User'}</Text>
+        </View>
+
+        {/* Search Bar */}
+        <View style={styles.searchBar}>
+          <Ionicons name="search" size={24} color="gray" />
+          <TextInput
+            placeholder="What do you want to listen to?"
+            style={styles.searchInput}
+          />
+        </View>
+
+        {/* Suggestions Section */}
+        <Section title="Suggestions for you">
+  <View>
+    {randomSongs.map((song) => (
+      <TouchableOpacity
+        key={song.id}
+        onPress={() => navigation.navigate('PlayAudioScreen', { song })}
+        style={styles.songRow}>
+        <Text style={styles.songTitle}>{song.title}</Text>
+      </TouchableOpacity>
+    ))}
+  </View>
+</Section>
+
+        {/* Charts Section */}
+        <Section title="Charts">
+          <Image
+            source={require('../assets/Home - Audio Listing/Container 31.png')}
+            style={styles.chartImage}
+          />
+          <Image
+            source={require('../assets/Home - Audio Listing/Container 32.png')}
+            style={styles.chartImage}
+          />
+        </Section>
+
+        {/* Trending Albums */}
+        <Section title="Trending Albums">
+          {albums.map((album) => {
+            // Tìm nghệ sĩ dựa trên idArtist của album
+            const artist = artistProfiles.find(
+              (artist) => artist.id === album.idArtist
+            );
+
+            return (
+              <TouchableOpacity
+                key={album.idAlbum}
+                style={styles.albumItem}
+                onPress={() =>
+                  navigation.navigate('AlbumSongs', { albumId: album.idAlbum })
+                }>
                 <Image
-                  source={require('../assets/Home - Audio Listing/Avatar 3.png')} // Replace with your profile image URL
-                  style={styles.profileImage}
+                  source={{ uri: album.image }} // Sử dụng { uri: <URL> }
+                  style={styles.albumImage}
                 />
+                <Text style={styles.albumTitle}>{album.name}</Text>
+                {artist && <Text style={{fontSize:20}}>{artist.name}</Text>}
               </TouchableOpacity>
-            </View>
-          </View>
-          <View style={styles.header}>
-            <Text style={styles.greeting}>Good morning,</Text>
-            <Text style={styles.username}>Ashley Scott</Text>
-          </View>
+            );
+          })}
+        </Section>
 
-          {/* Search Bar */}
-          <View style={styles.searchBar}>
-            <TouchableOpacity>
-              <Ionicons name="search" size={24} color="gray" />
+        {/* Popular Artists */}
+        <Section title="Popular Artists">
+          {artistProfiles.map((artist) => (
+            <TouchableOpacity
+              key={artist.id}
+              style={styles.artistItem}
+              onPress={() =>
+                navigation.navigate('ArtistProfile', { artistId: artist.id })
+              }>
+              <Image
+                source={{ uri: artist.image }} // Sử dụng { uri: <URL> }
+                style={styles.artistImage}
+              />
+              <Text style={styles.artistName}>{artist.name}</Text>
             </TouchableOpacity>
-            <TextInput
-              placeholder="What do you want to listen to"
-              style={styles.searchInput}
-            />
-          </View>
-
-          {/* Suggestions Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Suggestions for you</Text>
-            {/*showsHorizontalScrollIndicator={false}*/}
-            <ScrollView horizontal >
-              <View style={styles.suggestionItem}>
-                <Image
-                  source={require('../assets/Home - Audio Listing/Container 26.png')}
-                  style={styles.suggestionImage}
-                />
-              </View>
-              <View style={styles.suggestionItem}>
-                <Image
-                  source={require('../assets/Home - Audio Listing/Container 27.png')}
-                  style={styles.suggestionImage}
-                />
-              </View>
-            </ScrollView>
-          </View>
-
-          {/* Charts Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Charts</Text>
-            <ScrollView horizontal>
-              {/*<View style={styles.chartItem}>
-                <Text style={styles.chartTitle}>Top 50</Text>
-                <Text style={styles.chartSubtitle}>Canada</Text>
-              </View>*/}
-              <View style={styles.chartItem}>
-                  <Image
-                  source={require('../assets/Home - Audio Listing/Container 31.png')}
-                  style={styles.suggestionImage}
-                />
-                <Text>Daily chart-toppers update</Text>
-              </View>
-              <View style={styles.chartItem}>
-                  <Image
-                  source={require('../assets/Home - Audio Listing/Container 32.png')}
-                  style={styles.suggestionImage}
-                />
-                <Text>Daily chart-toppers update</Text>
-              </View>
-              <View style={styles.chartItem}>
-                  <Image
-                  source={require('../assets/Home - Audio Listing/Container 33.png')}
-                  style={styles.suggestionImage}
-                />
-                <Text>Daily chart-toppers update</Text>
-              </View>
-            </ScrollView>
-          </View>
-
-          {/* Trending Albums Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Trending albums</Text>
-            <ScrollView horizontal>
-              <View style={styles.albumItem}>
-                <Image
-                 source={require('../assets/Home - Audio Listing/Image 45.png')}
-                  style={styles.albumImage}
-                />
-                <Text style={styles.albumTitle}>ME</Text>
-                <Text style={styles.albumArtist}>Jessica Gonzalez</Text>
-              </View>
-              <View style={styles.albumItem}>
-                <Image
-                  source={require('../assets/Home - Audio Listing/Image 46.png')}
-                  style={styles.albumImage}
-                />
-                <Text style={styles.albumTitle}>Magna nost</Text>
-                <Text style={styles.albumArtist}>Brian Thomas</Text>
-              </View>
-              <View style={styles.albumItem}>
-                <Image
-                  source={require('../assets/Home - Audio Listing/Image 47.png')}
-                  style={styles.albumImage}
-                />
-                <Text style={styles.albumTitle}>Magna nost</Text>
-                <Text style={styles.albumArtist}>Brian Thomas</Text>
-              </View>
-            </ScrollView>
-          </View>
-
-          {/* Popular Artists Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Popular artists</Text>
-            <ScrollView horizontal>
-              <TouchableOpacity  style={styles.artistItem} onPress={() => navigation.navigate('ArtistProfile')}>
-                <Image
-                  source={require('../assets/Home - Audio Listing/Image 39.png')}
-                  style={styles.artistImage}
-                />
-                <Text style={styles.artistName}>Jennifer Wilson</Text>
-                <TouchableOpacity style={styles.followButton}>
-                  <Text style={styles.followButtonText}>Follow</Text>
-                </TouchableOpacity>
-              </TouchableOpacity >
-              <TouchableOpacity  style={styles.artistItem} onPress={() => navigation.navigate('ArtistProfile')}>
-                <Image
-                  source={require('../assets/Home - Audio Listing/Image 40.png')}
-                  style={styles.artistImage}
-                />
-                <Text style={styles.artistName}>Elizabeth Hall</Text>
-                <TouchableOpacity style={styles.followButton}>
-                  <Text style={styles.followButtonText}>Follow</Text>
-                </TouchableOpacity>
-              </TouchableOpacity >
-              <TouchableOpacity  style={styles.artistItem} onPress={() => navigation.navigate('ArtistProfile')}>
-                <Image
-                  source={require('../assets/Home - Audio Listing/Image 41.png')}
-                  style={styles.artistImage}
-                />
-                <Text style={styles.artistName}>Jennifer Wilson</Text>
-                <TouchableOpacity style={styles.followButton}>
-                  <Text style={styles.followButtonText}>Follow</Text>
-                </TouchableOpacity>
-              </TouchableOpacity >
-            </ScrollView>
-          </View>
-          <View style={{padding:20}} ></View>
-        </ScrollView>
+          ))}
+        </Section>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    marginTop: 1,
-    backgroundColor: '#fff',
-  },
-  header1: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 10,
-    backgroundColor: '#fff',
-    paddingTop: StatusBar.currentHeight || 0,
-  },
-  logo: {
-    width: 30,
-    height: 30,
-    resizeMode: 'contain',
-  },
-  rightIcons: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  iconButton: {
-    marginRight: 15,
-  },
-  profileButton: {
-    borderRadius: 50,
-    overflow: 'hidden',
-  },
-  profileImage: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-  },
+  container: { flex: 1, backgroundColor: '#fff' },
+  scrollView: { paddingHorizontal: 16 },
   header: {
+    flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     padding: 16,
+    backgroundColor: '#fff',
   },
+   sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 10,
+  },
+  songRow: {
+    padding: 15,
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    marginBottom: 10,
+    flexDirection: 'column', // Đảm bảo các thành phần xếp dọc
+    alignItems: 'flex-start', // Canh trái
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3, // Hiệu ứng đổ bóng cho Android
+  },
+  songTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#333',
+  },
+  logo: { width: 30, height: 30, resizeMode: 'contain' },
+  rightIcons: { flexDirection: 'row', alignItems: 'center' },
+  iconButton: { marginRight: 15 },
+  profileImage: { width: 30, height: 30, borderRadius: 15 },
+  greetingContainer: { marginVertical: 16 },
   greeting: { fontSize: 18, color: '#333' },
   username: { fontSize: 24, fontWeight: 'bold' },
-
   searchBar: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
     flexDirection: 'row',
-    borderWidth: 3,
-    borderColor: '#f0f0f0',
-    marginHorizontal: 10,
-    borderRadius: 30,
     alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 16,
+    borderRadius: 25,
+    marginBottom: 20,
   },
-  searchInput: { padding: 10, borderRadius: 8, width: '100%' },
-
-  section: { marginTop: 20, paddingHorizontal: 16 },
+  searchInput: { marginLeft: 10, flex: 1 },
+  section: { marginBottom: 20 },
   sectionTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
-
-  suggestionItem: { marginRight: 10, alignItems: 'center', height: 300 },
-  suggestionImage: { width: 200, borderRadius: 8 },
-
-  chartItem: {
-    marginRight: 10,
+  suggestionImage: {
+    width: 150,
+    height: 150,
     borderRadius: 8,
-    alignItems: 'center',
-
-    
+    marginRight: 10,
   },
-
-  albumItem: { marginRight: 10 , width:130},
-  albumImage: { width: 120, height: 120, borderRadius: 8 },
-  albumTitle: { fontWeight: 'bold', marginTop: 8 },
-  albumArtist: { color: '#555' },
-
-  artistItem: { alignItems: 'center', marginRight: 10 , width:120},
+  chartImage: { width: 120, height: 120, borderRadius: 8, marginRight: 10 },
+  albumItem: {
+    marginBottom: 16,
+    width:150,
+    marginRight:30,
+  },
+  albumImage: {
+    width: 150,
+    height: 150,
+    borderRadius: 8,
+  },
+  albumTitle: {
+    marginTop: 8,
+    fontSize: 13,
+    fontWeight: 'bold',
+  },
+  artistName: {
+    marginTop: 4,
+    fontSize: 14,
+    color: 'gray',
+    textAlign: 'center',
+  },
+  artistItem: { alignItems: 'center', marginRight: 10 },
   artistImage: { width: 80, height: 80, borderRadius: 40 },
   artistName: { marginTop: 8, fontWeight: 'bold' },
-  followButton: {
-    marginTop: 4,
-    paddingHorizontal: 16,
-    paddingVertical: 4,
-    backgroundColor: '#1e90ff',
-    borderRadius: 16,
-  },
-  followButtonText: { color: '#fff' },
 });
