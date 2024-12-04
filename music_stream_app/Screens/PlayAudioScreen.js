@@ -1,160 +1,204 @@
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import Slider from '@react-native-community/slider';
-import Icon from 'react-native-vector-icons/Ionicons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import React, { useState, useEffect } from 'react';
+import { View, TouchableOpacity, StyleSheet, Text, ScrollView } from 'react-native';
+import { Audio } from 'expo-av';
+import { Ionicons } from '@expo/vector-icons';
+import Slider from '@react-native-community/slider'; // Thêm Slider
+import { songs } from '../data/songs'; // Import dữ liệu bài hát
 
-const PlayAudioScreen = ({ route, navigation }) => {
-  console.log('PlayAudioScreen params:', route.params);
-  const { title, artist, image, plays, duration } = route.params || {};
+export default function MusicPlayerScreen({ route }) {
+  const { song: initialSong } = route.params; // Nhận thông tin bài hát từ route.params
+  const [song, setSong] = useState(initialSong); // Bài hát hiện tại
+  const [sound, setSound] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolume] = useState(1); // Mức âm lượng (0 đến 1)
+  const [randomSongs, setRandomSongs] = useState([]); // Danh sách bài hát ngẫu nhiên
+
+  // Phát nhạc
+  const playSound = async (uri) => {
+    if (sound !== null) {
+      await sound.unloadAsync(); // Dọn dẹp âm thanh cũ
+    }
+    const { sound: newSound } = await Audio.Sound.createAsync(
+      { uri },
+      { shouldPlay: true, volume }
+    );
+    setSound(newSound);
+    setIsPlaying(true);
+  };
+
+  // Tạm dừng nhạc
+  const pauseSound = async () => {
+    if (sound !== null) {
+      await sound.pauseAsync();
+      setIsPlaying(false);
+    }
+  };
+
+  // Điều chỉnh âm lượng
+  const adjustVolume = async (value) => {
+    setVolume(value);
+    if (sound !== null) {
+      await sound.setVolumeAsync(value);
+    }
+  };
+
+  // Lấy danh sách bài hát ngẫu nhiên
+  useEffect(() => {
+    const shuffledSongs = songs.sort(() => 0.5 - Math.random()).slice(0, 20);
+    setRandomSongs(shuffledSongs);
+    playSound(initialSong.uri); // Phát bài hát đầu tiên khi mở màn hình
+  }, []);
+
+  // Dọn dẹp âm thanh khi thoát màn hình
+  useEffect(() => {
+    return () => {
+      if (sound !== null) {
+        sound.unloadAsync();
+      }
+    };
+  }, [sound]);
+
+  // Xử lý khi chọn bài hát
+  const handleSongSelect = async (selectedSong) => {
+    setSong(selectedSong);
+    await playSound(selectedSong.uri); // Phát bài hát ngay lập tức
+  };
+
+  // Chuyển đến bài hát tiếp theo
+  const handleNextSong = () => {
+    const currentIndex = randomSongs.findIndex((item) => item.id === song.id);
+    const nextIndex = (currentIndex + 1) % randomSongs.length;
+    const nextSong = randomSongs[nextIndex];
+    setSong(nextSong);
+    playSound(nextSong.uri); // Phát bài hát tiếp theo
+  };
+
+  // Quay lại bài hát trước
+  const handlePrevSong = () => {
+    const currentIndex = randomSongs.findIndex((item) => item.id === song.id);
+    const prevIndex = (currentIndex - 1 + randomSongs.length) % randomSongs.length;
+    const prevSong = randomSongs[prevIndex];
+    setSong(prevSong);
+    playSound(prevSong.uri); // Phát bài hát trước
+  };
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Icon name="chevron-down" size={24} color="#FFF" />
-        </TouchableOpacity>
-        <Text style={styles.headerText}>Play</Text>
-        <View style={{ width: 24 }} /> {/* Placeholder for symmetry */}
-      </View>
+      {/* Hiển thị bài hát đang phát */}
+      <Text style={styles.nowPlaying}>Đang phát: {song.title}</Text>
 
-      {/* Song Image */}
-      <Image source={image} style={styles.songImage} />
+      {/* Danh sách bài hát */}
+      <ScrollView style={styles.songList}>
+  {randomSongs.map((songItem) => (
+    <TouchableOpacity
+      key={songItem.id}
+      style={[
+        styles.songItem,
+        songItem.id === song.id && styles.currentSongItem, // Áp dụng màu nền cho bài hát đang phát
+      ]}
+      onPress={() => handleSongSelect(songItem)}
+    >
+      <Text
+        style={[
+          styles.songTitle,
+          songItem.id === song.id && styles.currentSongTitle, // Áp dụng màu chữ cho bài hát đang phát
+        ]}
+      >
+        {songItem.title}
+      </Text>
+    </TouchableOpacity>
+  ))}
+</ScrollView>
 
-      {/* Song Information */}
-      <View style={styles.songInfoContainer}>
-        <Text style={styles.songTitle}>{title}</Text>
-        <Text style={styles.songArtist}>{artist}</Text>
-      </View>
 
-      {/* Progress Slider */}
-      <Slider
-        style={styles.slider}
-        minimumValue={0}
-        maximumValue={1}
-        minimumTrackTintColor="#FFFFFF"
-        maximumTrackTintColor="#888888"
-        thumbTintColor="#FFFFFF"
-      />
-
-      {/* Time */}
-      <View style={styles.timeContainer}>
-        <Text style={styles.timeText}>0:06</Text>
-        <Text style={styles.timeText}>{duration}</Text>
-      </View>
-
-      {/* Controls */}
-      <View style={styles.controlsContainer}>
-        <TouchableOpacity>
-          <Icon name="shuffle" size={24} color="#FFF" />
+      {/* Các nút điều khiển */}
+      <View style={styles.controls}>
+        <TouchableOpacity onPress={handlePrevSong}>
+          <Ionicons name="play-skip-back" size={30} color="#fff" />
         </TouchableOpacity>
-        <TouchableOpacity>
-          <Icon name="play-back" size={24} color="#FFF" />
+        <TouchableOpacity onPress={isPlaying ? pauseSound : () => playSound(song.uri)}>
+          <Ionicons
+            name={isPlaying ? 'pause' : 'play'}
+            size={40}
+            color="#fff"
+          />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.playButton}>
-          <Icon name="play" size={30} color="#000" />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Icon name="play-forward" size={24} color="#FFF" />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Icon name="repeat" size={24} color="#FFF" />
+        <TouchableOpacity onPress={handleNextSong}>
+          <Ionicons name="play-skip-forward" size={30} color="#fff" />
         </TouchableOpacity>
       </View>
 
-      {/* Social Actions */}
-      <View style={styles.socialContainer}>
-        <TouchableOpacity style={styles.socialItem}>
-          <FontAwesome name="heart" size={18} color="#FFF" />
-          <Text style={styles.socialText}>12K</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.socialItem}>
-          <FontAwesome name="comment" size={18} color="#FFF" />
-          <Text style={styles.socialText}>450</Text>
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <FontAwesome name="share" size={18} color="#FFF" />
-        </TouchableOpacity>
+      {/* Thanh điều chỉnh âm lượng */}
+      <View style={styles.volumeContainer}>
+        <Ionicons name="volume-mute" size={20} color="#fff" />
+        <Slider
+          style={styles.volumeSlider}
+          minimumValue={0}
+          maximumValue={1}
+          value={volume}
+          onValueChange={adjustVolume}
+          minimumTrackTintColor="#1db954" // Màu phần trượt đã chọn
+          maximumTrackTintColor="#fff" // Màu phần trượt chưa chọn
+          thumbTintColor="#1db954" // Màu nút trượt
+        />
+        <Ionicons name="volume-high" size={20} color="#fff" />
       </View>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
-    padding: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#1e1e1e', // Nền tối
   },
-  header: {
+  nowPlaying: {
+    fontSize: 18,
+    color: '#fff',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  songList: {
+    width: '90%',
+    marginBottom: 30,
+  },
+  songItem: {
+    padding: 15,
+    backgroundColor: '#333', // Màu nền mặc định
+    marginBottom: 10,
+    borderRadius: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingBottom: 20,
   },
-  headerText: {
-    color: '#FFF',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  songImage: {
-    width: '100%',
-    height: 300,
-    borderRadius: 10,
-    marginBottom: 20,
-  },
-  songInfoContainer: {
-    alignItems: 'center',
-    marginBottom: 10,
+  currentSongItem: {
+    backgroundColor: '#1db954', // Màu nền của bài hát đang phát
   },
   songTitle: {
-    color: '#FFF',
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  songArtist: {
-    color: '#888',
+    color: '#fff', // Màu chữ mặc định
     fontSize: 16,
   },
-  slider: {
-    width: '100%',
+  currentSongTitle: {
+    color: '#000', // Màu chữ của bài hát đang phát
+    fontWeight: 'bold', // Chữ in đậm
+  },
+  controls: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    width: '90%',
+    marginBottom: 20,
+  },
+  volumeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '80%',
+  },
+  volumeSlider: {
+    flex: 1,
     height: 40,
-  },
-  timeContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 10,
-  },
-  timeText: {
-    color: '#888',
-    fontSize: 12,
-  },
-  controlsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  playButton: {
-    backgroundColor: '#FFF',
-    borderRadius: 50,
-    padding: 15,
-  },
-  socialContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 10,
-  },
-  socialItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  socialText: {
-    color: '#FFF',
-    fontSize: 16,
-    paddingLeft: 4,
+    marginHorizontal: 10,
   },
 });
-
-export default PlayAudioScreen;
