@@ -1,57 +1,102 @@
-import React, { useState } from 'react';
-import { View, Text, FlatList, Image, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/FontAwesome';
 
+// Ánh xạ hình ảnh
+const imageMap = {
+  "Image 101.png": require("../assets/My Library/Image 101.png"),
+  "Image 102.png": require("../assets/My Library/Image 102.png"),
+  "Image 103.png": require("../assets/My Library/Image 103.png"),
+  "Image 104.png": require("../assets/My Library/Image 104.png"),
+  "Image 105.png": require("../assets/My Library/Image 105.png"),
+  "Image 106.png": require("../assets/My Library/Image 106.png"),
+  // Thêm các ảnh tại đây...
+};
+
+const artist = {
+  name: 'Mer Watson',
+  followers: '1.234K Followers',
+  profilePic: require('../assets/My Library/Image 107.png'),
+};
 
 const Library = () => {
   const [selectedTag, setSelectedTag] = useState('All');
+  const [allSongsData, setAllSongsData] = useState([]);
+  const [tags, setTags] = useState(['All']);
   const navigation = useNavigation();
 
-  const tags = ["All", "Playlists", "New tag", "Songs", "Albums", "Artists"];
-  const artist = {
-    name: 'Mer Watson',
-    followers: '1.234K Followers',
-    profilePic: require('../assets/My Library/Image 107.png'),
-  };
+  useEffect(() => {
+    const fetchSongs = async () => {
+      try {
+        const response = await fetch('http://192.168.1.10:8080/api/songs');
+        const data = await response.json();
 
-  const allSongsData = [
-    { id: '1', title: 'FLOWER', artist: 'Jessica Gonzalez', plays: '2.1M', duration: '3:36', liked: true, tag: 'Songs', image: require('../assets/My Library/Image 101.png') },
-    { id: '2', title: 'Shape of You', artist: 'Anthony Taylor', plays: '68M', duration: '3:35', liked: true, tag: 'Songs', image: require('../assets/My Library/Image 102.png') },
-    { id: '3', title: 'Blinding Lights', artist: 'Ashley Scott', plays: '4 songs', duration: '', liked: false, tag: 'Playlists', image: require('../assets/My Library/Image 103.png') },
-    { id: '4', title: 'Levitating', artist: 'Anthony Taylor', plays: '9M', duration: '7:48', liked: false, tag: 'Songs', image: require('../assets/My Library/Image 104.png') },
-    { id: '5', title: 'Astronaut in the Ocean', artist: 'Pedro Moreno', plays: '23M', duration: '3:36', liked: true, tag: 'Albums', image: require('../assets/My Library/Image 105.png') },
-    { id: '6', title: 'Dynamite', artist: 'Elena Jimenez', plays: '10M', duration: '6:22', liked: true, tag: 'Albums', image: require('../assets/My Library/Image 106.png') },
-  ];
+        const transformedData = data.map((song) => ({
+          id: song.id,
+          title: song.title,
+          artist: song.artist.name,
+          plays: song.playCount,
+          duration: song.duration,
+          liked: song.liked,
+          tag: song.tags,
+          image: imageMap[song.image.split('/').pop()], // Tra cứu từ ánh xạ hình ảnh
+          lyrics: song.lyrics,
+          releaseDate: song.releaseDate,
+          language: song.language,
+          genre: song.genre,
+          album: song.album?.title || null,
+        }));
+
+        const uniqueTags = ['All', ...new Set(data.flatMap((song) => song.tags.split(',').map((tag) => tag.trim())))];
+
+        setAllSongsData(transformedData);
+        setTags(uniqueTags);
+      } catch (error) {
+        console.error('Error fetching songs:', error);
+      }
+    };
+
+    fetchSongs();
+  }, []);
 
   const getFilteredData = () => {
     if (selectedTag === 'All') return allSongsData;
-    return allSongsData.filter((song) => song.tag === selectedTag);
+    return allSongsData.filter((song) => song.tag.split(',').map((tag) => tag.trim()).includes(selectedTag));
   };
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Your Library</Text>
+    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16 }}>
+        <Text style={{ fontSize: 24, fontWeight: 'bold' }}>Your Library</Text>
         <TouchableOpacity>
-          <Icon name="search" size={20} color="#000" />
+          <Text style={{ fontSize: 18 }}>🔍</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Tags */}
-      <View style={styles.tagsContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollViewContent}>
+      <View style={{ height: 50, marginBottom: 10 }}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ alignItems: 'center', paddingHorizontal: 16 }}
+        >
           {tags.map((tag, index) => (
             <TouchableOpacity
               key={index}
               onPress={() => setSelectedTag(tag)}
-              style={[
-                styles.tag,
-                { backgroundColor: selectedTag === tag ? '#ccc' : '#f0f0f0' },
-              ]}
+              style={{
+                paddingHorizontal: 16,
+                paddingVertical: 8,
+                backgroundColor: selectedTag === tag ? '#ccc' : '#f0f0f0',
+                borderRadius: 16,
+                marginRight: 8,
+              }}
             >
-              <Text style={{ fontWeight: selectedTag === tag ? 'bold' : 'normal', color: selectedTag === tag ? '#000' : '#888' }}>
+              <Text
+                style={{
+                  fontWeight: selectedTag === tag ? 'bold' : 'normal',
+                  color: selectedTag === tag ? '#000' : '#888',
+                }}
+              >
                 {tag}
               </Text>
             </TouchableOpacity>
@@ -60,43 +105,43 @@ const Library = () => {
       </View>
 
       {/* Following Section */}
-      <View style={styles.followingSection}>
-        <Image source={artist.profilePic} style={styles.profilePic} />
+      <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 10 }}>
+        <Image source={artist.profilePic} style={{ width: 60, height: 60, borderRadius: 30, marginRight: 16 }} />
         <View style={{ flex: 1 }}>
-          <Text style={styles.artistName}>{artist.name}</Text>
-          <Text style={styles.followerCount}>{artist.followers}</Text>
+          <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{artist.name}</Text>
+          <Text style={{ color: '#777' }}>{artist.followers}</Text>
         </View>
-        <TouchableOpacity style={styles.followButton}>
-          <Text style={styles.followButtonText}>Follow</Text>
+        <TouchableOpacity style={{ backgroundColor: '#000', borderRadius: 20, paddingVertical: 8, paddingHorizontal: 16 }}>
+          <Text style={{ color: '#fff' }}>Follow</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Song List */}
       <FlatList
         data={getFilteredData()}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <TouchableOpacity
-            onPress={() => {
-              console.log('Navigating to PlayAudio with item:', item); // Debug log
+            onPress={() =>
               navigation.navigate('PlayAudio', {
                 title: item.title,
                 artist: item.artist,
                 image: item.image,
                 plays: item.plays,
                 duration: item.duration,
-              });
-            }}
-            style={styles.songItem}
+              })
+            }
+            style={{ flexDirection: 'row', alignItems: 'center', padding: 16 }}
           >
-            <Image source={item.image} style={styles.songImage} />
+            <Image source={item.image} style={{ width: 50, height: 50, borderRadius: 8, marginRight: 16 }} />
             <View style={{ flex: 1 }}>
-              <Text style={styles.songTitle}>{item.title}</Text>
-              <Text style={styles.songArtist}>{item.artist}</Text>
-              <Text style={styles.songPlays}>{item.plays} {item.duration ? `• ${item.duration}` : ''}</Text>
+              <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.title}</Text>
+              <Text style={{ color: '#777' }}>{item.artist}</Text>
+              <Text style={{ color: '#777' }}>
+                {item.plays} {item.duration ? `• ${item.duration}` : ''}
+              </Text>
             </View>
             <TouchableOpacity>
-              <Icon name="heart" size={20} color={item.liked ? 'blue' : '#ddd'} />
+              <Text style={{ fontSize: 24, color: item.liked ? 'blue' : '#ddd' }}>💙</Text>
             </TouchableOpacity>
           </TouchableOpacity>
         )}
@@ -104,85 +149,5 @@ const Library = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-  },
-  headerText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  tagsContainer: {
-    height: 50,
-    marginBottom: 10,
-  },
-  scrollViewContent: {
-    alignItems: 'center',
-    paddingHorizontal: 16,
-  },
-  tag: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 16,
-    marginRight: 8,
-  },
-  followingSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-  },
-  profilePic: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginRight: 16,
-  },
-  artistName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  followerCount: {
-    color: '#777',
-  },
-  followButton: {
-    backgroundColor: '#000',
-    borderRadius: 20,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-  },
-  followButtonText: {
-    color: '#fff',
-  },
-  songItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-  },
-  songImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 8,
-    marginRight: 16,
-  },
-  songTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  songArtist: {
-    color: '#777',
-  },
-  songPlays: {
-    color: '#777',
-  },
-});
 
 export default Library;
